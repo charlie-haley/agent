@@ -117,6 +117,7 @@ require (
 	github.com/open-telemetry/opentelemetry-collector-contrib/processor/attributesprocessor v0.87.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/processor/k8sattributesprocessor v0.87.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/processor/probabilisticsamplerprocessor v0.87.0
+	github.com/open-telemetry/opentelemetry-collector-contrib/processor/resourcedetectionprocessor v0.87.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/processor/servicegraphprocessor v0.87.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/processor/spanmetricsprocessor v0.87.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/processor/spanprocessor v0.87.0
@@ -622,7 +623,9 @@ require (
 
 require (
 	dario.cat/mergo v1.0.0 // indirect
+	github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v1.20.0 // indirect
 	github.com/Shopify/sarama v1.38.1 // indirect
+	github.com/Showmax/go-fqdn v1.0.0 // indirect
 	github.com/Workiva/go-datastructures v1.1.0 // indirect
 	github.com/drone/envsubst v1.0.3 // indirect
 	github.com/go-jose/go-jose/v3 v3.0.0 // indirect
@@ -633,8 +636,11 @@ require (
 	github.com/leoluk/perflib_exporter v0.2.0 // indirect
 	github.com/lightstep/go-expohisto v1.0.0 // indirect
 	github.com/metalmatze/signal v0.0.0-20210307161603-1c9aa721a97a // indirect
+	github.com/open-telemetry/opentelemetry-collector-contrib/internal/aws/ecsutil v0.87.0 // indirect
+	github.com/open-telemetry/opentelemetry-collector-contrib/internal/common v0.87.0 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/k8sconfig v0.87.0 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/kafka v0.87.0 // indirect
+	github.com/open-telemetry/opentelemetry-collector-contrib/internal/metadataproviders v0.87.0 // indirect
 	github.com/openshift/api v3.9.0+incompatible // indirect
 	github.com/openshift/client-go v0.0.0-20210521082421-73d9475a9142 // indirect
 	github.com/prometheus-community/prom-label-proxy v0.6.0 // indirect
