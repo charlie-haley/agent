@@ -228,7 +228,6 @@ require (
 	gotest.tools v2.2.0+incompatible
 	k8s.io/api v0.28.3
 	k8s.io/apiextensions-apiserver v0.28.0
-	k8s.io/apimachinery v0.28.3
 	k8s.io/client-go v0.28.3
 	k8s.io/component-base v0.28.1
 	k8s.io/klog/v2 v2.100.1
@@ -618,6 +617,7 @@ require (
 	github.com/prometheus/tsdb v0.10.0
 	go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc v0.42.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.19.0
+	k8s.io/apimachinery v0.28.3
 )
 
 require (
