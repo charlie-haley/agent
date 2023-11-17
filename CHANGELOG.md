@@ -12,6 +12,22 @@ Main (unreleased)
 
 ### Breaking changes
 
+- In the azure exporter, dimension options will no longer be validated by the Azure API. (@kgeckhart)
+  - This change will not break any existing configurations and you can opt in to validation via the `validate_dimensions` configuration option.
+  - Before this change, pulling metrics for azure resources with variable dimensions required one configuration per metric + dimension combination to avoid an error.
+  - After this change, you can include all metrics and dimensions in a single configuration and the Azure APIs will only return dimensions which are valid for the various metrics.
+
+### Enhancements
+
+- Azure exporter enhancements for flow and static mode, (@kgeckhart)
+  - Allows for pulling metrics at the Azure subscription level instead of resource by resource 
+  - Disable dimension validation by default to reduce the number of exporter instances needed for full dimension coverage
+
+v0.38.0-rc.0 (2023-11-16)
+-------------------------
+
+### Breaking changes
+
 - Remove `otelcol.exporter.jaeger` component (@hainenber)
 
 - In the mysqld exporter integration, some metrics are removed and others are renamed. (@marctc)
@@ -25,11 +41,6 @@ Main (unreleased)
     - metric "transaction_in_queue" was Counter instead of Gauge
     - renamed 3 metrics starting with `mysql_perf_schema_transaction_` to start with `mysql_perf_schema_transactions_` to be consistent with column names.
     - exposing only server's own stats by matching `MEMBER_ID` with `@@server_uuid` resulting "member_id" label to be dropped.
-
-- In the azure exporter, dimension options will no longer be validated by the Azure API. (@kgeckhart)
-  - This change will not break any existing configurations and you can opt in to validation via the `validate_dimensions` configuration option.
-  - Before this change, pulling metrics for azure resources with variable dimensions required one configuration per metric + dimension combination to avoid an error.
-  - After this change, you can include all metrics and dimensions in a single configuration and the Azure APIs will only return dimensions which are valid for the various metrics.
 
 ### Other changes
 
@@ -67,9 +78,55 @@ Main (unreleased)
 
   - `otelcol.processor.filter` - filters OTLP telemetry data using OpenTelemetry
     Transformation Language (OTTL). (@hainenber)
+  - `otelcol.receiver.vcenter` - receives metrics telemetry data from vCenter. (@marctc)
 
+- Agent Management: Introduce support for remotely managed external labels for logs. (@jcreixell)
+
+### Enhancements
+
+- The `loki.write` WAL now has snappy compression enabled by default. (@thepalbi)
+
+- Allow converting labels to structured metadata with Loki's structured_metadata stage. (@gonzalesraul)
+
+- Improved performance of `pyroscope.scrape` component when working with a large number of targets. (@cyriltovena)
+
+- Added support for comma-separated list of fields in `source` option and a
+  new `separator` option in `drop` stage of `loki.process`. (@thampiotr)
+
+- The `loki.source.docker` component now allows connecting to Docker daemons
+  over HTTP(S) and setting up TLS credentials. (@tpaschalis)
+
+- Added an `exclude_event_message` option to `loki.source.windowsevent` in flow mode,
+  which excludes the human-friendly event message from Windows event logs. (@ptodev)
+
+- Improve detection of rolled log files in `loki.source.kubernetes` and
+  `loki.source.podlogs` (@slim-bean).
+
+- Support clustering in `loki.source.kubernetes` (@slim-bean).
+
+- Support clustering in `loki.source.podlogs` (@rfratto).
+
+- Make component list sortable in web UI. (@hainenber)
+
+- Adds new metrics (`mssql_server_total_memory_bytes`, `mssql_server_target_memory_bytes`,
+  and `mssql_available_commit_memory_bytes`) for `mssql` integration.
+
+- Grafana Agent Operator: `config-reloader` container no longer runs as root.
+  (@rootmout)
+
+- Added support for replaying not sent data for `loki.write` when WAL is enabled. (@thepalbi)
+
+- Make the result of 'discovery.kubelet' support pods that without ports, such as k8s control plane static pods. (@masonmei)
+
+- Added support for unicode strings in `pyroscope.ebpf` python profiles. (@korniltsev)
+
+- Improved resilience of graph evaluation in presence of slow components. (@thampiotr)
+
+- Updated windows exporter to use prometheus-community/windows_exporter commit 1836cd1. (@mattdurham)
 
 ### Bugfixes
+
+- Set exit code 1 on grafana-agentctl non-runnable command. (@fgouteroux)
 
 - Fixed an issue where `loki.process` validation for stage `metric.counter` was
   allowing invalid combination of configuration options. (@thampiotr)
@@ -103,41 +160,46 @@ Main (unreleased)
 
 - Fixed a bug where UDP syslog messages were never processed (@joshuapare)
 
+- Updating configuration for `loki.write` no longer drops data. (@thepalbi)
+
+- Fixed a bug in WAL where exemplars were recorded before the first native histogram samples for new series,
+  resulting in remote write sending the exemplar first and Prometheus failing to ingest it due to missing
+  series. (@krajorama)
+
+- Fixed an issue in the static config converter where exporter instance values
+  were not being mapped when translating to flow. (@erikbaranowski)
+
+- Fix a bug which prevented Agent from running `otelcol.exporter.loadbalancing`
+  with a `routing_key` of `traceID`. (@ptodev)
+
+- Added Kubernetes service resolver to static node's loadbalancing exporter
+  and to Flow's `otelcol.exporter.loadbalancing`. (@ptodev)
+
+### Other changes
+
+- Bump `mysqld_exporter` version to v0.15.0. (@marctc)
+
+- Bump `github-exporter` version to 1.0.6. (@marctc)
+
+- Use Go 1.21.4 for builds. (@rfratto)
+
+- Change User-Agent header for outbound requests to include agent-mode, goos, and deployment mode. Example `GrafanaAgent/v0.38.0 (flow; linux; docker)` (@captncraig)
+
+- `loki.source.windowsevent` and `loki.source.*` changed to use a more robust positions file to prevent corruption on reboots when writing
+  the positions file. (@mattdurham)
+
+v0.37.4 (2023-11-06)
+-----------------
+
 ### Enhancements
-
-- The `loki.write` WAL now has snappy compression enabled by default. (@thepalbi)
-
-- Allow converting labels to structured metadata with Loki's structured_metadata stage. (@gonzalesraul)
-
-- Improved performance of `pyroscope.scrape` component when working with a large number of targets. (@cyriltovena)
-
-- Added support for comma-separated list of fields in `source` option and a
-  new `separator` option in `drop` stage of `loki.process`. (@thampiotr)
-
-- The `loki.source.docker` component now allows connecting to Docker daemons
-  over HTTP(S) and setting up TLS credentials. (@tpaschalis)
 
 - Added an `add_metric_suffixes` option to `otelcol.exporter.prometheus` in flow mode,
   which configures whether to add type and unit suffixes to metrics names. (@mar4uk)
 
-- Added an `exclude_event_message` option to `loki.source.windowsevent` in flow mode,
-  which excludes the human-friendly event message from Windows event logs. (@ptodev)
+### Bugfixes
 
-- Improve detection of rolled log files in `loki.source.kubernetes` and
-  `loki.source.podlogs` (@slim-bean).
-
-- Support clustering in `loki.source.kubernetes` (@slim-bean).
-
-- Support clustering in `loki.source.podlogs` (@rfratto).
-
-- Make component list sortable in web UI. (@hainenber)
-
-- Adds new metrics (`mssql_server_total_memory_bytes`, `mssql_server_target_memory_bytes`,
-  and `mssql_available_commit_memory_bytes`) for `mssql` integration.
-
-- Azure exporter enhancements for flow and static mode, (@kgeckhart)
-  - Allows for pulling metrics at the Azure subscription level instead of resource by resource 
-  - Disable dimension validation by default to reduce the number of exporter instances needed for full dimension coverage 
+- Fix a bug where reloading the configuration of a `loki.write` component lead
+  to a panic. (@tpaschalis)
 
 v0.37.3 (2023-10-26)
 -----------------
